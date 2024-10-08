@@ -6,9 +6,42 @@ date: "2024-10-08"
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999999)
 ```
 
-```{r}
-print('Hello World!')
+```{r data read, include = FALSE}
+df = readRDS(
+  '/Users/aronsomogyi/Desktop/University/Károli Szakdolgozat/Programok/R-Thesis/Adatok/Eredeti/Media Merged 20240920.rds'
+)
+```
+
+```{r libraries, echo=FALSE, warning=FALSE}
+library(tidyverse)
+
+library(showtext)
+library(ggtext)
+showtext.auto(enable = T)
+
+sysfonts::font_add_google(name = 'Oswald', family = 'Oswald')
+font = 'Oswald'
+```
+
+# Data Exploration and cleaning
+
+```{r domain count, echo=FALSE}
+df |> 
+  group_by(domain) |> 
+  mutate(domain = case_when(domain == 'www.ripost.hu' ~ 'ripost', 
+                            domain == 'ripost.hu' ~ 'ripost',
+                            T~domain)) |> 
+  summarise(count = n()) |> 
+  ggplot() +
+    geom_col(aes(x= reorder(str_to_title(domain), count), y = count), width = .5, fill = 'black')+
+    theme_void()+
+    geom_text(
+      aes(x=str_to_title(domain), y = count - 15000, label = count), 
+      family = font, color = 'white')+
+    coord_flip()+
+    theme(axis.text.y = element_text(face = 'bold', family = font, hjust = .9))
 ```
 
